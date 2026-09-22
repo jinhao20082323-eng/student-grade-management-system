@@ -1,3 +1,5 @@
+from student import Student
+
 print("Student Grade Management System")
 
 students = []
