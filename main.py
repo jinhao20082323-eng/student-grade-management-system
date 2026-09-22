@@ -16,17 +16,22 @@ for i in range(3):
 
     average = (math_grade + english_grade + science_grade) / 3
 
-    students.append([name, average])
-
+    print(rank, student[0], "-", round(student[1], 2))
+    
 print("\nStudent Results")
 
 for student in students:
-    print(student[0], "-", round(student[1], 2))
-  students.sort(key=lambda x: x[1], reverse=True)
+    print(student.name, "-", round(student.average, 2))
+
+students.sort(
+    key=lambda x: x.average,
+    reverse=True
+)
+
 print("\nRanking")
 
 rank = 1
 
 for student in students:
-    print(rank, student[0], "-", round(student[1], 2))
+    print(rank, student.name, "-", round(student.average, 2))
     rank += 1
