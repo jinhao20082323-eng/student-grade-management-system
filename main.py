@@ -16,8 +16,8 @@ for i in range(3):
 
     average = (math_grade + english_grade + science_grade) / 3
 
-    print(rank, student[0], "-", round(student[1], 2))
-    
+    students.append(Student(name, average))
+
 print("\nStudent Results")
 
 for student in students:
