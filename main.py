@@ -13,51 +13,62 @@ def get_grade(average):
 
     else:
         return "F"
+def save_students():
 
+    with open("data.txt", "w") as file:
+
+        for student in students:
+
+            file.write(
+                student.name + "," +
+                str(student.average) + "\n"
+            )
+    print("Data Saved.")
+def load_students():
+
+    try:
+
+        with open("data.txt", "r") as file:
+
+            for line in file:
+
+                data = line.strip().split(",")
+
+                if len(data) == 2:
+
+                    name = data[0]
+                    average = float(data[1])
+
+                    students.append(
+                        Student(name, average)
+                    )
+
+    except FileNotFoundError:
+
+        pass
 print("Student Grade Management System")
 
 students = []
+
+load_students()
+
+print("Data loaded successfully.")
 # Get the info of 3 students
-for i in range(3):
+# for i in range(3):
 
-    print("\nStudent", i + 1)
+#     print("\nStudent", i + 1)
 
-    name = input("Enter student name: ")
+#     name = input("Enter student name: ")
 
-    math_grade = float(input("Math Grade: "))
-    english_grade = float(input("English Grade: "))
-    science_grade = float(input("Science Grade: "))
+#     math_grade = float(input("Math Grade: "))
+#     english_grade = float(input("English Grade: "))
+#     science_grade = float(input("Science Grade: "))
 
-    average = (math_grade + english_grade + science_grade) / 3
+#     average = (math_grade + english_grade + science_grade) / 3
 
-    students.append(Student(name, average))
+#     students.append(Student(name, average))
 # Show results w/ rank
-print("\nStudent Results")
 
-for student in students:
-    print(student.name,
-        "-",
-        round(student.average, 2),
-        "-",
-        get_grade(student.average))
-students.sort(
-    key=lambda x: x.average,
-    reverse=True
-)
-
-print("\nRanking")
-
-rank = 1
-
-for student in students:
-    print(rank,
-          student.name,
-          "-",
-          round(student.average, 2),
-          "-",
-          get_grade(student.average))
-
-    rank += 1
 # menu system
 while True:
 
@@ -69,6 +80,7 @@ while True:
     print("5. Delete Student")
     print("6. Ranking")
     print("7. Exit")
+    print("8. Statistics")
 
     choice = input("Choose: ")
 
@@ -102,7 +114,7 @@ while True:
         students.append(
             Student(name, average)
         )
-
+        save_students()
         print("Student added successfully.")
     elif choice == "3":
 
@@ -112,7 +124,7 @@ while True:
 
         for student in students:
 
-            if student.name.lower() == search_name.lower():
+            if search_name.lower() in student.name.lower():
 
                 print(
                     student.name,
@@ -138,12 +150,18 @@ while True:
 
             if student.name.lower() == edit_name.lower():
 
-                new_average = float(
-                    input("Enter new average: ")
-                )
+                math_grade = float(input("Math Grade: "))
+                english_grade = float(input("English Grade: "))
+                science_grade = float(input("Science Grade: "))
+
+                new_average = (
+                    math_grade +
+                    english_grade +
+                    science_grade
+                ) / 3
 
                 student.average = new_average
-
+                save_students()
                 print("Student updated.")
 
                 found = True
@@ -164,7 +182,7 @@ while True:
             if student.name.lower() == delete_name.lower():
 
                 students.remove(student)
-
+                save_students()
                 print("Student deleted.")
 
                 found = True
@@ -197,5 +215,23 @@ while True:
             rank += 1
 
     elif choice == "7":
+        save_students()
         print("Goodbye!")
         break
+    elif choice == "8":
+
+        if len(students) > 0:
+
+            highest = max(students, key=lambda x: x.average)
+
+            lowest = min(students, key=lambda x: x.average)
+
+            class_average = (
+                sum(student.average for student in students)
+                / len(students)
+            )
+
+            print("Total Students:", len(students))
+            print("Highest Score:", highest.name, round(highest.average, 2))
+            print("Lowest Score:", lowest.name, round(lowest.average, 2))
+            print("Class Average:", round(class_average, 2))
