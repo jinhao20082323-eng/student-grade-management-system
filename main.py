@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 from student import Student
 # Letter Grading system
 def get_grade(average):
@@ -81,7 +82,7 @@ while True:
     print("6. Ranking")
     print("7. Exit")
     print("8. Statistics")
-
+    print("9. Grade Chart")
     choice = input("Choose: ")
 
     if choice == "2":
@@ -194,14 +195,15 @@ while True:
 
     elif choice == "6":
 
-        students.sort(
+        sorted_students = sorted(
+            students,
             key=lambda x: x.average,
             reverse=True
         )
 
         rank = 1
 
-        for student in students:
+        for student in sorted_students:
 
             print(
                 rank,
@@ -230,8 +232,42 @@ while True:
                 sum(student.average for student in students)
                 / len(students)
             )
-
+            print("\n===== STATISTICS =====")
             print("Total Students:", len(students))
             print("Highest Score:", highest.name, round(highest.average, 2))
             print("Lowest Score:", lowest.name, round(lowest.average, 2))
             print("Class Average:", round(class_average, 2))
+        else:
+            print("No students found.")
+    elif choice == "9":
+
+        if len(students) == 0:
+
+            print("No students found.")
+
+        else:
+
+            names = [student.name for student in students]
+            averages = [student.average for student in students]
+
+            plt.figure(figsize=(8, 5))
+
+            bars = plt.bar(names, averages)
+
+
+            plt.title("Student Grade Chart")
+            plt.xlabel("Students")
+            plt.ylabel("Average Score")
+            plt.ylim(0, 110)
+            for bar, average in zip(bars, averages):
+                plt.text(
+                    bar.get_x() + bar.get_width() / 2,
+                    bar.get_height() + 1,
+                    str(round(average, 2)),
+                    ha="center"
+                )
+
+            plt.tight_layout()
+            plt.savefig("grade_chart.png")
+
+            print("Chart saved as grade_chart.png")
