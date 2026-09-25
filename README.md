@@ -1,5 +1,7 @@
 # Student Grade Management System
 
+![Project Banner](project_banner.png)
+
 A Python-based student grade management system that allows users
 to manage student records, calculate grades, analyze class performance,
 and visualize student results.
@@ -37,7 +39,9 @@ The system can calculate:
 
 ## Data Visualization
 
-Student performance can be visualized using a bar chart.
+The system generates a bar chart to visualize student performance.
+
+![Grade Chart](grade_chart.png)
 
 ## Future Improvements
 
@@ -49,7 +53,3 @@ Student performance can be visualized using a bar chart.
 ## Author
 
 Jinhao 
-
-## Grade Chart
-
-![Student Grade Chart](grade_chart.png)
