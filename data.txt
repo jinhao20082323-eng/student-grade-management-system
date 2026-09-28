@@ -1,5 +1,0 @@
-student 1,90.92
-student 2,100.0
-student 3,67.67676767676768
-student 4,90.0
-student 5,99.99
