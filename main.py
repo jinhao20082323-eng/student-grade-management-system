@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 from student import Student
-# Letter Grading system
 students = []
 def get_valid_grade(subject):
     while True:
@@ -31,24 +30,15 @@ def save_students():
 def load_students():
     try:
         with open("data.txt", "r") as file:
-
             for line in file:
                 line = line.strip()
-
-                # Skip empty lines
                 if not line:
                     continue
-
                 data = line.split(",")
-
-                # Check data format
                 if len(data) != 4:
                     print("Warning: Invalid data format skipped.")
                     continue
-
                 name = data[0]
-
-                # Check whether grades are numbers
                 try:
                     math_grade = float(data[1])
                     english_grade = float(data[2])
@@ -59,8 +49,6 @@ def load_students():
                         f'Warning: Invalid student "{name}" data skipped.'
                     )
                     continue
-
-                # Check grade range
                 if not (
                     0 <= math_grade <= 100
                     and 0 <= english_grade <= 100
@@ -70,8 +58,6 @@ def load_students():
                         f'Warning: Student "{name}" has invalid grades, data skipped.'
                     )
                     continue
-
-                # Create Student object
                 students.append(
                     Student(
                         name,
@@ -80,7 +66,6 @@ def load_students():
                         science_grade
                     )
                 )
-
     except FileNotFoundError:
         pass
 def delete_all():
