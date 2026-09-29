@@ -1,11 +1,13 @@
 import matplotlib.pyplot as plt
 from student import Student
 students = []
+def is_valid_grade(grade):
+    return 0 <= grade <= 100
 def get_valid_grade(subject):
     while True:
         try:
             grade = float(input(subject + " Grade: "))
-            if 0 <= grade <= 100:
+            if is_valid_grade(grade):
                 return grade
             else:
                 print("Grade must be between 0 and 100.")
@@ -49,11 +51,7 @@ def load_students():
                         f'Warning: Invalid student "{name}" data skipped.'
                     )
                     continue
-                if not (
-                    0 <= math_grade <= 100
-                    and 0 <= english_grade <= 100
-                    and 0 <= science_grade <= 100
-                ):
+                if not all(is_valid_grade(grade) for grade in [math_grade,english_grade,science_grade]):
                     print(
                         f'Warning: Student "{name}" has invalid grades, data skipped.'
                     )
@@ -184,34 +182,68 @@ def statistics():
         print("Highest Score:", highest.name, round(highest.calculate_average(), 2))
         print("Lowest Score:", lowest.name, round(lowest.calculate_average(), 2))
         print("Class Average:", round(class_average, 2))
+def add_bar_labels(bars, grades):
+    for bar, grade in zip(bars, grades):
+        if int(grade) == grade:
+            grade = int(grade)
+        plt.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 1,
+            str(round(grade, 2)),
+            ha="center",
+            fontsize=8
+        )
 def grade_chart():
     if not students:
         print("Student dataset is empty.")
     else:
         names = [student.name for student in students]
+        math_grades = [student.math_grade for student in students]
+        english_grades = [student.english_grade for student in students]
+        science_grades = [student.science_grade for student in students]
         averages = [student.calculate_average() for student in students]
-        plt.figure(figsize=(8, 5))
-        bars = plt.bar(names, averages)
+        x = range(len(students))
+        width = .2
+        plt.figure(figsize=(10, 7))
+#       bars = plt.bar(names, averages)
+        bars = [plt.bar(
+            [position - 1.5 * width for position in x],
+            math_grades,
+            width=width,
+            label="Math"
+        ),
+        plt.bar(
+            [position - .5 * width for position in x],
+            english_grades,
+            width=width,
+            label="English"
+        ),
+        plt.bar(
+            [position + .5 * width for position in x],
+            science_grades,
+            width=width,
+            label="Science"
+        ),
+        plt.bar(
+            [position + 1.5 * width for position in x],
+            averages,
+            width=width,
+            label="Average"
+        )]
+        grades = [math_grades, english_grades, science_grades, averages]
         plt.title("Student Grade Chart")
         plt.xlabel("Students")
-        plt.ylabel("Average Score")
+        plt.xticks(x, names)
+        plt.legend()
+        plt.ylabel("Score")
         plt.ylim(0, 110)
-        for bar, average in zip(bars, averages):
-            plt.text(
-                    bar.get_x() + bar.get_width() / 2,
-                    bar.get_height() + 1,
-                    str(round(average, 2)),
-                    ha="center"
-                )
+        for bar_group, grade_group in zip(bars, grades):
+            add_bar_labels(bar_group, grade_group)
         plt.tight_layout()
         plt.savefig("grade_chart.png")
         print("Chart saved as grade_chart.png")
-
 print("Student Grade Management System")
-
-
 load_students()
-
 print("Data loaded successfully.")
 while True:
 
