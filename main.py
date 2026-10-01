@@ -40,7 +40,10 @@ def load_students():
                 if len(data) != 4:
                     print("Warning: Invalid data format skipped.")
                     continue
-                name = data[0]
+                name = data[0].strip()
+                if not name:
+                    print("Warning: Empty name found.")
+                    continue
                 try:
                     math_grade = float(data[1])
                     english_grade = float(data[2])
@@ -51,7 +54,7 @@ def load_students():
                         f'Warning: Invalid student "{name}" data skipped.'
                     )
                     continue
-                if not all(is_valid_grade(grade) for grade in [math_grade,english_grade,science_grade]):
+                if not all(is_valid_grade(grade) for grade in [math_grade, english_grade, science_grade]):
                     print(
                         f'Warning: Student "{name}" has invalid grades, data skipped.'
                     )
@@ -74,8 +77,14 @@ def delete_all():
         print("Data deleted.")
     else:
         print("Delete cancelled.")
+def get_valid_name():
+    while True:
+        name = input("Enter student name: ").strip()
+        if name:
+            return name
+        print("Student name cannot be empty.")
 def add_student():
-    name = input("Enter student name: ")
+    name = get_valid_name()
     math_grade = get_valid_grade("Math")
     english_grade = get_valid_grade("English")
     science_grade = get_valid_grade("Science")
@@ -106,7 +115,7 @@ def search_student():
     if not students:
         print("Student dataset is empty.")
     else:
-        search_name = input("Enter student name: ")
+        search_name = input("Enter student name: ").strip()
         found = False
         for student in students:
             if search_name.lower() in student.name.lower():
@@ -124,7 +133,7 @@ def edit_student():
     if not students:
         print("Student dataset is empty.")
     else:
-        edit_name = input("Enter student name: ")
+        edit_name = input("Enter student name: ").strip()
         found = False
         for student in students:
             if student.name.lower() == edit_name.lower():
@@ -141,7 +150,7 @@ def delete_student():
     if not students:
         print("Student dataset is empty.")
     else:
-        delete_name = input("Enter student name: ")   
+        delete_name = input("Enter student name: ").strip()
         found = False
         for student in students:
             if student.name.lower() == delete_name.lower():    
@@ -168,20 +177,31 @@ def ranking():
 def statistics():
     if not students:
         print("Student dataset is empty.")
-    else:
-        highest = max(students, key=lambda x: x.calculate_average())
-
-        lowest = min(students, key=lambda x: x.calculate_average())
-
-        class_average = (
-                sum(student.calculate_average() for student in students)
-                / len(students)
-            )
-        print("\n===== STATISTICS =====")
-        print("Total Students:", len(students))
-        print("Highest Score:", highest.name, round(highest.calculate_average(), 2))
-        print("Lowest Score:", lowest.name, round(lowest.calculate_average(), 2))
-        print("Class Average:", round(class_average, 2))
+        return
+    math_average = sum(student.math_grade for student in students) / len(students)
+    english_average = sum(student.english_grade for student in students) / len(students)
+    science_average = sum(student.science_grade for student in students) / len(students)
+    highest_math = max(students, key=lambda x: x.math_grade)
+    highest_english = max(students, key=lambda x: x.english_grade)
+    highest_science = max(students, key=lambda x: x.science_grade)
+    highest_student = max(students, key=lambda x: x.calculate_average())
+    lowest_student = min(students, key=lambda x: x.calculate_average())
+    class_average = (sum(student.calculate_average() for student in students) / len(students))
+    failed = sum(student.calculate_average() < 60 for student in students)
+    passed = len(students) - failed
+    pass_rate = passed/len(students) * 100
+    print("\n===== STATISTICS =====")
+    print("Total Students:", len(students), "\n")
+    print("Math Average:", round(math_average, 2))
+    print("English Average:", round(english_average, 2))
+    print("Science Average:", round(science_average, 2))
+    print("Class Average:", round(class_average, 2), "\n")
+    print(f'Highest in Math: {highest_math.name} ({round(highest_math.math_grade, 2)})')
+    print(f'Highest in English: {highest_english.name} ({round(highest_english.english_grade, 2)})')
+    print(f'Highest in Science: {highest_science.name} ({round(highest_science.science_grade, 2)})')
+    print("Highest Score: ", highest_student.name, " (", round(highest_student.calculate_average(), 2), ")", sep="")
+    print("Lowest Score: ", lowest_student.name, " (", round(lowest_student.calculate_average(), 2), ")", sep="")
+    print(f"Passed: {passed}\nFailed: {failed}\nPass rate: {round(pass_rate, 2)}%")
 def add_bar_labels(bars, grades):
     for bar, grade in zip(bars, grades):
         if int(grade) == grade:
@@ -234,6 +254,7 @@ def grade_chart():
         plt.title("Student Grade Chart")
         plt.xlabel("Students")
         plt.xticks(x, names)
+        plt.axhline(y = 60, label = "Pass Line (60%)", linestyle = "--", color = "black")
         plt.legend()
         plt.ylabel("Score")
         plt.ylim(0, 110)
@@ -242,6 +263,23 @@ def grade_chart():
         plt.tight_layout()
         plt.savefig("grade_chart.png")
         print("Chart saved as grade_chart.png")
+def view_student_details():
+    if not students:
+        print("Student dataset is empty.")
+        return
+    name = input("Enter student name: ").strip()
+    found = False
+    for student in students:
+        if name.lower() in student.name.lower():
+            print(f"\n{student.name}")
+            print(f"Math Grade: {student.math_grade}")
+            print(f"English Grade: {student.english_grade}")
+            print(f"Science Grade: {student.science_grade}")
+            average = student.calculate_average()
+            print(f"Average: {round(average, 2)} ({get_grade(average)})")
+            found = True
+    if not found:
+        print("Student not found.")
 print("Student Grade Management System")
 load_students()
 print("Data loaded successfully.")
@@ -258,6 +296,7 @@ while True:
     print("8. Statistics")
     print("9. Grade Chart")
     print("10. Delete all data")
+    print("11. View Student details")
     choice = input("Choose: ")
 
     if choice == "1":
@@ -282,5 +321,7 @@ while True:
         grade_chart()
     elif choice == "10":
         delete_all()
+    elif choice == "11":
+        view_student_details()
     else:
         print("Please enter a number from the menu.")
