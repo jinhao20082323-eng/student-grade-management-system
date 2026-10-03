@@ -1,9 +1,13 @@
 import csv
 import matplotlib.pyplot as plt
 from student import Student
+
 students = []
+
 def is_valid_grade(grade):
     return 0 <= grade <= 100
+
+
 def get_valid_grade(subject):
     while True:
         try:
@@ -14,6 +18,8 @@ def get_valid_grade(subject):
                 print("Grade must be between 0 and 100.")
         except ValueError:
             print("Please enter a valid number.")
+
+
 def get_grade(average):
     if average >= 90:
         return "A"
@@ -25,11 +31,15 @@ def get_grade(average):
         return "D"
     else:
         return "F"
+
+
 def save_students():
     with open("data.txt", "w") as file:
         for student in students:
             file.write(f'{student.name},{student.math_grade},{student.english_grade},{student.science_grade}\n')
     print("Data saved.")
+
+
 def load_students():
     try:
         with open("data.txt", "r") as file:
@@ -70,6 +80,8 @@ def load_students():
                 )
     except FileNotFoundError:
         pass
+
+
 def delete_all():
     confirm = input("Are you sure you want to delete all data? Enter Y to confirm: ")
     if confirm.upper() == "Y":
@@ -78,12 +90,16 @@ def delete_all():
         print("Data deleted.")
     else:
         print("Delete cancelled.")
+
+
 def get_valid_name():
     while True:
         name = input("Enter student name: ").strip()
         if name:
             return name
         print("Student name cannot be empty.")
+
+
 def add_student():
     name = get_valid_name()
     math_grade = get_valid_grade("Math")
@@ -99,6 +115,8 @@ def add_student():
     )
     save_students()
     print("Student added successfully.")
+
+
 def view_student():
     if not students:
         print("Student dataset is empty.")
@@ -107,6 +125,8 @@ def view_student():
     for student in students:
         average = student.calculate_average()
         print(f'{student.name}: {average:.2f} ({get_grade(average)})')
+
+
 def search_student():
     if not students:
         print("Student dataset is empty.")
@@ -120,6 +140,8 @@ def search_student():
             found = True
     if not found:
         print("Student not found.")
+
+
 def edit_student():
     if not students:
         print("Student dataset is empty.")
@@ -134,6 +156,8 @@ def edit_student():
             print("Student updated.")
             return
     print("Student not found.")
+
+
 def delete_student():
     if not students:
         print("Student dataset is empty.")
@@ -146,18 +170,61 @@ def delete_student():
             print("Student deleted.")   
             return   
     print("Student not found.")
-def ranking():
+
+
+def sort_students():
     if not students:
         print("Student dataset is empty.")
         return
-    sorted_students = sorted(
-        students, 
-        key=lambda x: x.calculate_average(), 
-        reverse=True
+    print("Sort by:",
+    "1. Math Grade",
+    "2. English Grade",
+    "3. Science Grade",
+    "4. Average",
+    sep="\n"
     )
+    while True:
+        choice = input("Choose: ")
+        if choice == "1":
+            title = "Math"
+            key = lambda x: x.math_grade
+            break
+        elif choice == "2":
+            title = "English"
+            key = lambda x: x.english_grade
+            break
+        elif choice == "3":
+            title = "Science"
+            key = lambda x: x.science_grade
+            break
+        elif choice == "4":
+            title = "Average"
+            key = lambda x: x.calculate_average()
+            break
+        else:
+            print("Please choose a number from the menu.")
+    print("Sort order:",
+    "1. Highest to Lowest",
+    "2. Lowest to Highest",
+    sep="\n"
+    )
+    while True:
+        choice = input("Choose: ")
+        if choice in ["1", "2"]:
+            break
+        else:
+            print("Please choose a number from the menu.")
+    sorted_students = sorted(
+    students,
+    key=key,
+    reverse=choice == "1"
+    )
+    print(f"Sorted by {title} Grade: ")
     for rank, student in enumerate(sorted_students, start=1):
-        average = student.calculate_average()
-        print(f"{rank}. {student.name}: {average:.2f} ({get_grade(average)})")
+        grade = key(student)
+        print(f"{rank}. {student.name}: {grade:.2f} ({get_grade(grade)})")
+
+
 def statistics():
     if not students:
         print("Student dataset is empty.")
@@ -186,6 +253,8 @@ def statistics():
     print(f'Highest Score: {highest_student.name} ({highest_student.calculate_average():.2f})')
     print(f'Lowest Score: {lowest_student.name} ({lowest_student.calculate_average():.2f})')
     print(f'Passed: {passed}\nFailed: {failed}\nPass rate: {pass_rate:.2f}%')
+
+
 def add_bar_labels(bars, grades):
     for bar, grade in zip(bars, grades):
         if int(grade) == grade:
@@ -197,6 +266,8 @@ def add_bar_labels(bars, grades):
             ha="center",
             fontsize=8
         )
+
+
 def grade_chart():
     if not students:
         print("Student dataset is empty.")
@@ -246,6 +317,8 @@ def grade_chart():
     plt.tight_layout()
     plt.savefig("grade_chart.png")
     print("Chart saved as grade_chart.png")
+
+
 def view_student_details():
     if not students:
         print("Student dataset is empty.")
@@ -265,6 +338,8 @@ def view_student_details():
             found = True
     if not found:
         print("Student not found.")
+
+
 def export_csv():
     if not students:
         print("Student dataset is empty.")
@@ -283,24 +358,28 @@ def export_csv():
                 get_grade(average)]
             )
     print("File exported as students.csv")
+
+
 def main():
     print("Student Grade Management System")
     load_students()
     print("Data loaded successfully.")
     while True:
-        print("\n===== MENU =====")
-        print("1. Add Student")
-        print("2. View Students")
-        print("3. Search Student")
-        print("4. Edit Student")
-        print("5. Delete Student")
-        print("6. Ranking")
-        print("7. Exit")
-        print("8. Statistics")
-        print("9. Grade Chart")
-        print("10. Delete all data")
-        print("11. View Student details")
-        print("12. Export CSV File")
+        print("\n===== MENU =====",
+            "1. Add Student",
+            "2. View Students",
+            "3. Search Student",
+            "4. Edit Student",
+            "5. Delete Student",
+            "6. Sort Students",
+            "7. Statistics",
+            "8. Grade Chart",
+            "9. Delete All Data",
+            "10. View Student Details",
+            "11. Export CSV File",
+            "12. Exit",
+            sep="\n"
+        )
         choice = input("Choose: ")
         if choice == "1":
             add_student()
@@ -313,23 +392,25 @@ def main():
         elif choice == "5":
             delete_student()
         elif choice == "6":
-            ranking()
+            sort_students()
         elif choice == "7":
+            statistics()
+        elif choice == "8":
+            grade_chart()
+        elif choice == "9":
+            delete_all()
+        elif choice == "10":
+            view_student_details()
+        elif choice == "11":
+            export_csv()
+        elif choice == "12":
             save_students()
             print("Goodbye!")
             break
-        elif choice == "8":
-            statistics()
-        elif choice == "9":
-            grade_chart()
-        elif choice == "10":
-            delete_all()
-        elif choice == "11":
-            view_student_details()
-        elif choice == "12":
-            export_csv()
         else:
-            print("Please enter a number from the menu.")
+            print("Input is not a number from the menu.")
+        input("Press Enter to continue.\n")
+
 
 if __name__ == "__main__":
     main()
