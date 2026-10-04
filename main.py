@@ -33,6 +33,13 @@ def get_grade(average):
         return "F"
 
 
+def find_student(name):
+    for student in students:
+        if name.lower() == student.name.lower():
+            return student
+    return None
+
+
 def save_students():
     with open("data.txt", "w") as file:
         for student in students:
@@ -43,6 +50,7 @@ def save_students():
 def load_students():
     try:
         with open("data.txt", "r") as file:
+            names = set()
             for line in file:
                 line = line.strip()
                 if not line:
@@ -54,6 +62,9 @@ def load_students():
                 name = data[0].strip()
                 if not name:
                     print("Warning: Empty name found.")
+                    continue
+                if name.lower() in names:
+                    print(f'Warning: Duplicate student "{name}" skipped.')
                     continue
                 try:
                     math_grade = float(data[1])
@@ -70,6 +81,7 @@ def load_students():
                         f'Warning: Student "{name}" has invalid grades, data skipped.'
                     )
                     continue
+                names.add(name.lower())
                 students.append(
                     Student(
                         name,
@@ -96,12 +108,18 @@ def get_valid_name():
     while True:
         name = input("Enter student name: ").strip()
         if name:
+            if "," in name:
+                print('Student name must not include ","')
+                continue
             return name
         print("Student name cannot be empty.")
 
 
 def add_student():
     name = get_valid_name()
+    if find_student(name) is not None:
+        print("Student already exists.")
+        return
     math_grade = get_valid_grade("Math")
     english_grade = get_valid_grade("English")
     science_grade = get_valid_grade("Science")
@@ -131,12 +149,19 @@ def search_student():
     if not students:
         print("Student dataset is empty.")
         return
-    search_name = input("Enter student name: ").strip()
+    name = get_valid_name()
     found = False
     for student in students:
-        if search_name.lower() in student.name.lower():
+        if name.lower() in student.name.lower():
             average = student.calculate_average()
-            print(f'{student.name}: {average:.2f} ({get_grade(average)})')
+            print(
+                f"\n{student.name}",
+                f"Math Grade: {student.math_grade}",
+                f"English Grade: {student.english_grade}",
+                f"Science Grade: {student.science_grade}",
+                f"Average: {average:.2f} ({get_grade(average)})",
+                sep="\n"
+            )
             found = True
     if not found:
         print("Student not found.")
@@ -146,15 +171,14 @@ def edit_student():
     if not students:
         print("Student dataset is empty.")
         return
-    edit_name = input("Enter student name: ").strip()
-    for student in students:
-        if student.name.lower() == edit_name.lower():
-            student.math_grade = get_valid_grade("Math")
-            student.english_grade = get_valid_grade("English")
-            student.science_grade = get_valid_grade("Science")
-            save_students()
-            print("Student updated.")
-            return
+    student = find_student(get_valid_name())
+    if student is not None:
+        student.math_grade = get_valid_grade("Math")
+        student.english_grade = get_valid_grade("English")
+        student.science_grade = get_valid_grade("Science")
+        save_students()
+        print("Student updated.")
+        return
     print("Student not found.")
 
 
@@ -162,14 +186,13 @@ def delete_student():
     if not students:
         print("Student dataset is empty.")
         return
-    delete_name = input("Enter student name: ").strip()
-    for student in students:
-        if student.name.lower() == delete_name.lower():    
-            students.remove(student)
-            save_students()
-            print("Student deleted.")   
-            return   
-    print("Student not found.")
+    student = find_student(get_valid_name())
+    if student is None:
+        print("Student not found.")
+        return
+    students.remove(student)
+    save_students()
+    print("Student deleted.")
 
 
 def sort_students():
@@ -319,26 +342,6 @@ def grade_chart():
     print("Chart saved as grade_chart.png")
 
 
-def view_student_details():
-    if not students:
-        print("Student dataset is empty.")
-        return
-    name = input("Enter student name: ").strip()
-    found = False
-    for student in students:
-        if name.lower() in student.name.lower():
-            average = student.calculate_average()
-            print(f"\n{student.name}",
-            f"Math Grade: {student.math_grade}",
-            f"English Grade: {student.english_grade}",
-            f"Science Grade: {student.science_grade}",
-            f"Average: {average:.2f} ({get_grade(average)})", 
-            sep="\n"
-            )
-            found = True
-    if not found:
-        print("Student not found.")
-
 
 def export_csv():
     if not students:
@@ -375,9 +378,8 @@ def main():
             "7. Statistics",
             "8. Grade Chart",
             "9. Delete All Data",
-            "10. View Student Details",
-            "11. Export CSV File",
-            "12. Exit",
+            "10. Export CSV File",
+            "11. Exit",
             sep="\n"
         )
         choice = input("Choose: ")
@@ -400,10 +402,8 @@ def main():
         elif choice == "9":
             delete_all()
         elif choice == "10":
-            view_student_details()
-        elif choice == "11":
             export_csv()
-        elif choice == "12":
+        elif choice == "11":
             save_students()
             print("Goodbye!")
             break
