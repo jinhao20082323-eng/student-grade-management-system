@@ -1,6 +1,5 @@
 # Student Grade Management System
 
-![Project Banner](project_banner.png)
 
 A Python-based student grade management system that allows users
 to manage student records, calculate grades, analyze class performance,

@@ -132,6 +132,7 @@ def add_student():
         )
     )
     save_students()
+    # 
     print("Student added successfully.")
 
 
